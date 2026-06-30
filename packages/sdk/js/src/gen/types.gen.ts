@@ -1234,10 +1234,6 @@ export type Config = {
    */
   autoshare?: boolean
   /**
-   * Automatically update to the latest version. Set to true to auto-update, false to disable, or 'notify' to show update notifications
-   */
-  autoupdate?: boolean | "notify"
-  /**
    * Disable providers that are loaded automatically
    */
   disabled_providers?: Array<string>
