@@ -354,7 +354,6 @@ export const ProvidersLoginCommand = effectCmd({
     const cfgSvc = yield* Config.Service
     const pluginSvc = yield* Plugin.Service
     const modelsDev = yield* ModelsDev.Service
-    yield* Effect.ignore(modelsDev.refresh(true))
 
     const config = yield* cfgSvc.get()
 

@@ -110,7 +110,7 @@ function applyModel(
   draft.limit = {
     context: model.limit.context,
     input: model.limit.input,
-    output: model.limit.output,
+    output: model.limit.output ?? model.limit.context,
   }
   Object.assign(draft.request.headers, input.request?.headers ?? {})
   Object.assign(draft.request.body, input.request?.body ?? {})

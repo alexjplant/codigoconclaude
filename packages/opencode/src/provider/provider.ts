@@ -1203,7 +1203,7 @@ function fromModelsDevModel(provider: ModelsDev.Provider, model: ModelsDev.Model
     limit: {
       context: model.limit.context,
       input: model.limit.input,
-      output: model.limit.output,
+      output: model.limit.output ?? model.limit.context,
     },
     capabilities: {
       temperature: model.temperature ?? false,
