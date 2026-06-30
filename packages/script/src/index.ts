@@ -36,9 +36,6 @@ export const Script = {
   get version() {
     return opencodePkg.version
   },
-  get preview() {
-    return false
-  },
   get release(): boolean {
     return !!process.env["OPENCODE_RELEASE"]
   },
