@@ -26,12 +26,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
-      - name: Setup Bun
-        uses: ./.github/actions/setup-bun
-
       - name: Read version
         id: version
-        run: bun -e "const p=await Bun.file('packages/opencode/package.json').json(); require('fs').appendFileSync(process.env.GITHUB_OUTPUT, 'version='+p.version+'\n')"
+        run: node -p "'version=' + require('./packages/opencode/package.json').version" >> "$GITHUB_OUTPUT"
 
       - name: Duplicate guard
         id: skip
