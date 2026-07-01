@@ -65,19 +65,23 @@ describe("ModelsDev Service", () => {
 
   it.live("get() returns empty catalog when disk is empty and no bundled snapshot", () =>
     Effect.gen(function* () {
+      yield* Effect.promise(() => rm(cacheFile, { force: true }))
       const result = yield* provided(ModelsDev.Service.use((s) => s.get()))
       expect(result).toEqual({})
     }),
   )
 
   it.live("get() caches across calls (later disk writes are ignored until process restart)", () =>
-    Effect.gen(function* () {
-      yield* writeCache(fixture)
-      const a = yield* provided(ModelsDev.Service.use((s) => s.get()))
-      yield* writeCache({})
-      const b = yield* provided(ModelsDev.Service.use((s) => s.get()))
-      expect(a).toEqual(fixture)
-      expect(b).toEqual(fixture)
-    }),
+    provided(
+      Effect.gen(function* () {
+        yield* writeCache(fixture)
+        const svc = yield* ModelsDev.Service
+        const a = yield* svc.get()
+        yield* writeCache({})
+        const b = yield* svc.get()
+        expect(a).toEqual(fixture)
+        expect(b).toEqual(fixture)
+      }),
+    ),
   )
 })
