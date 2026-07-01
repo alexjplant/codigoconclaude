@@ -141,10 +141,6 @@ function omit(options: Options, keys: ReadonlyArray<string>) {
   return Object.fromEntries(Object.entries(options).filter(([key]) => !keys.includes(key)))
 }
 
-function pick(options: Options, keys: ReadonlyArray<string>) {
-  return Object.fromEntries(Object.entries(options).filter(([key]) => keys.includes(key)))
-}
-
 function headers(input: unknown) {
   if (!isRecord(input)) return undefined
   return Object.fromEntries(
