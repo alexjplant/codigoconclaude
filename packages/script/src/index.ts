@@ -19,16 +19,6 @@ if (!semver.satisfies(process.versions.bun, expectedBunVersionRange)) {
 const opencodePkgPath = path.resolve(import.meta.dir, "../../../packages/opencode/package.json")
 const opencodePkg = await Bun.file(opencodePkgPath).json()
 
-const bot = ["actions-user", "opencode", "opencode-agent[bot]"]
-const teamPath = path.resolve(import.meta.dir, "../../../.github/TEAM_MEMBERS")
-const team = [
-  ...(await Bun.file(teamPath)
-    .text()
-    .then((x) => x.split(/\r?\n/).map((x) => x.trim()))
-    .then((x) => x.filter((x) => x && !x.startsWith("#")))),
-  ...bot,
-]
-
 export const Script = {
   get channel() {
     return "latest"
@@ -38,9 +28,6 @@ export const Script = {
   },
   get release(): boolean {
     return !!process.env["OPENCODE_RELEASE"]
-  },
-  get team() {
-    return team
   },
 }
 console.log(`opencode script`, JSON.stringify(Script, null, 2))
