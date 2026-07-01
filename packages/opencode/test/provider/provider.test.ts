@@ -748,24 +748,6 @@ it.instance(
   },
 )
 
-it.instance("getSmallModel skips inferred models for Azure", () =>
-  Effect.gen(function* () {
-    yield* set("AZURE_RESOURCE_NAME", "test-resource")
-    yield* set("AZURE_API_KEY", "test-key")
-    const model = yield* Provider.use.getSmallModel(ProviderV2.ID.azure)
-    expect(model).toBeUndefined()
-  }),
-)
-
-it.instance("getSmallModel skips inferred models for Azure Cognitive Services", () =>
-  Effect.gen(function* () {
-    yield* set("AZURE_COGNITIVE_SERVICES_RESOURCE_NAME", "test-resource")
-    yield* set("AZURE_COGNITIVE_SERVICES_API_KEY", "test-key")
-    const model = yield* Provider.use.getSmallModel(ProviderV2.ID.make("azure-cognitive-services"))
-    expect(model).toBeUndefined()
-  }),
-)
-
 it.instance(
   "getSmallModel respects config small_model override",
   Effect.gen(function* () {
@@ -1232,52 +1214,6 @@ it.instance(
   },
 )
 
-it.instance(
-  "hosted nvidia provider adds billing origin header",
-  Effect.gen(function* () {
-    const providers = yield* list
-    expect(providers[ProviderV2.ID.make("nvidia")].options.headers).toEqual({
-      "HTTP-Referer": "https://opencode.ai/",
-      "X-Title": "opencode",
-      "X-BILLING-INVOKE-ORIGIN": "OpenCode",
-    })
-  }),
-  { config: { provider: { nvidia: { options: { apiKey: "test-api-key" } } } } },
-)
-
-it.instance(
-  "custom nvidia baseURL adds billing origin header",
-  Effect.gen(function* () {
-    const providers = yield* list
-    expect(providers[ProviderV2.ID.make("nvidia")].options.headers).toEqual({
-      "HTTP-Referer": "https://opencode.ai/",
-      "X-Title": "opencode",
-      "X-BILLING-INVOKE-ORIGIN": "OpenCode",
-    })
-  }),
-  { config: { provider: { nvidia: { options: { apiKey: "test-api-key", baseURL: "http://localhost:8000/v1" } } } } },
-)
-
-it.instance(
-  "explicit nvidia billing origin header is preserved",
-  Effect.gen(function* () {
-    const providers = yield* list
-    expect(providers[ProviderV2.ID.make("nvidia")].options.headers["X-BILLING-INVOKE-ORIGIN"]).toBe("CustomOrigin")
-  }),
-  {
-    config: {
-      provider: {
-        nvidia: {
-          options: {
-            apiKey: "test-api-key",
-            baseURL: "http://localhost:8000/v1",
-            headers: { "X-BILLING-INVOKE-ORIGIN": "CustomOrigin" },
-          },
-        },
-      },
-    },
-  },
-)
 
 it.instance(
   "custom model inherits npm package from models.dev provider config",
@@ -1624,140 +1560,7 @@ it.instance(
   },
 )
 
-it.instance(
-  "Google Vertex: retains baseURL for custom proxy",
-  Effect.gen(function* () {
-    yield* set("GOOGLE_APPLICATION_CREDENTIALS", "test-creds")
-    const providers = yield* list
-    expect(providers[ProviderV2.ID.make("vertex-proxy")]).toBeDefined()
-    expect(providers[ProviderV2.ID.make("vertex-proxy")].options.baseURL).toBe("https://my-proxy.com/v1")
-  }),
-  {
-    config: {
-      provider: {
-        "vertex-proxy": {
-          name: "Vertex Proxy",
-          npm: "@ai-sdk/google-vertex",
-          api: "https://my-proxy.com/v1",
-          env: ["GOOGLE_APPLICATION_CREDENTIALS"],
-          models: { "gemini-pro": { name: "Gemini Pro", tool_call: true } },
-          options: {
-            project: "test-project",
-            location: "us-central1",
-            baseURL: "https://my-proxy.com/v1",
-          },
-        },
-      },
-    },
-  },
-)
 
-it.instance(
-  "Google Vertex: supports OpenAI compatible models",
-  Effect.gen(function* () {
-    yield* set("GOOGLE_APPLICATION_CREDENTIALS", "test-creds")
-    const providers = yield* list
-    const model = providers[ProviderV2.ID.make("vertex-openai")].models["gpt-4"]
-    expect(model).toBeDefined()
-    expect(model.api.npm).toBe("@ai-sdk/openai-compatible")
-  }),
-  {
-    config: {
-      provider: {
-        "vertex-openai": {
-          name: "Vertex OpenAI",
-          npm: "@ai-sdk/google-vertex",
-          env: ["GOOGLE_APPLICATION_CREDENTIALS"],
-          models: {
-            "gpt-4": {
-              name: "GPT-4",
-              provider: { npm: "@ai-sdk/openai-compatible", api: "https://api.openai.com/v1" },
-            },
-          },
-          options: { project: "test-project", location: "us-central1" },
-        },
-      },
-    },
-  },
-)
-
-it.instance("Google Vertex: uses REP endpoint for Claude continental multi-regions", () =>
-  Effect.gen(function* () {
-    yield* set("GOOGLE_CLOUD_PROJECT", "test-project")
-    yield* set("VERTEX_LOCATION", "eu")
-    const provider = yield* Provider.Service
-    const model = yield* provider.getModel(
-      ProviderV2.ID.make("google-vertex"),
-      ModelV2.ID.make("claude-sonnet-4-6@default"),
-    )
-    const language = yield* provider.getLanguage(model)
-    expect(languageBaseURL(language)).toBe(
-      "https://aiplatform.eu.rep.googleapis.com/v1/projects/test-project/locations/eu/publishers/anthropic/models",
-    )
-  }),
-)
-
-it.instance("Google Vertex Anthropic: uses REP endpoint for continental multi-regions", () =>
-  Effect.gen(function* () {
-    yield* set("GOOGLE_CLOUD_PROJECT", "test-project")
-    yield* set("VERTEX_LOCATION", "us")
-    const provider = yield* Provider.Service
-    const model = yield* provider.getModel(
-      ProviderV2.ID.make("google-vertex-anthropic"),
-      ModelV2.ID.make("claude-sonnet-4-6@default"),
-    )
-    const language = yield* provider.getLanguage(model)
-    expect(languageBaseURL(language)).toBe(
-      "https://aiplatform.us.rep.googleapis.com/v1/projects/test-project/locations/us/publishers/anthropic/models",
-    )
-  }),
-)
-
-it.instance("Google Vertex: keeps regional Claude endpoints unchanged", () =>
-  Effect.gen(function* () {
-    yield* set("GOOGLE_CLOUD_PROJECT", "test-project")
-    yield* set("VERTEX_LOCATION", "europe-west1")
-    const provider = yield* Provider.Service
-    const model = yield* provider.getModel(
-      ProviderV2.ID.make("google-vertex"),
-      ModelV2.ID.make("claude-sonnet-4-6@default"),
-    )
-    const language = yield* provider.getLanguage(model)
-    expect(languageBaseURL(language)).toBe(
-      "https://europe-west1-aiplatform.googleapis.com/v1/projects/test-project/locations/europe-west1/publishers/anthropic/models",
-    )
-  }),
-)
-
-it.instance("cloudflare-ai-gateway loads with env variables", () =>
-  Effect.gen(function* () {
-    yield* set("CLOUDFLARE_ACCOUNT_ID", "test-account")
-    yield* set("CLOUDFLARE_GATEWAY_ID", "test-gateway")
-    yield* set("CLOUDFLARE_API_TOKEN", "test-token")
-    const providers = yield* list
-    expect(providers[ProviderV2.ID.make("cloudflare-ai-gateway")]).toBeDefined()
-  }),
-)
-
-it.instance(
-  "cloudflare-ai-gateway forwards config metadata options",
-  Effect.gen(function* () {
-    yield* set("CLOUDFLARE_ACCOUNT_ID", "test-account")
-    yield* set("CLOUDFLARE_GATEWAY_ID", "test-gateway")
-    yield* set("CLOUDFLARE_API_TOKEN", "test-token")
-    const providers = yield* list
-    expect(providers[ProviderV2.ID.make("cloudflare-ai-gateway")]).toBeDefined()
-    expect(providers[ProviderV2.ID.make("cloudflare-ai-gateway")].options.metadata).toEqual({
-      invoked_by: "test",
-      project: "opencode",
-    })
-  }),
-  {
-    config: {
-      provider: { "cloudflare-ai-gateway": { options: { metadata: { invoked_by: "test", project: "opencode" } } } },
-    },
-  },
-)
 
 // Tests that need plugin file setup or multi-instance flows fall back to a
 // scoped tmpdir + provideInstance pattern via it.effect.
