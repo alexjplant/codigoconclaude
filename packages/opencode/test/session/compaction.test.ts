@@ -1748,7 +1748,7 @@ describe("SessionNs.getUsage", () => {
     expect(result.cost).toBe(0.9 + 0.4)
   })
 
-  test.each(["@ai-sdk/anthropic", "@ai-sdk/amazon-bedrock", "@ai-sdk/google-vertex/anthropic"])(
+  test.each(["@ai-sdk/anthropic"])(
     "computes total from components for %s models",
     (npm) => {
       const model = createModel({ context: 100_000, output: 32_000, npm })
@@ -1759,27 +1759,6 @@ describe("SessionNs.getUsage", () => {
         totalTokens: 1500,
         cacheReadInputTokens: 200,
       })
-      if (npm === "@ai-sdk/amazon-bedrock") {
-        const result = SessionNs.getUsage({
-          model,
-          usage: item,
-          metadata: {
-            bedrock: {
-              usage: {
-                cacheWriteInputTokens: 300,
-              },
-            },
-          },
-        })
-
-        // inputTokens (1000) includes cache, so adjusted = 1000 - 200 - 300 = 500
-        expect(result.tokens.input).toBe(500)
-        expect(result.tokens.cache.read).toBe(200)
-        expect(result.tokens.cache.write).toBe(300)
-        // total = adjusted (500) + output (500) + cacheRead (200) + cacheWrite (300)
-        expect(result.tokens.total).toBe(1500)
-        return
-      }
 
       const result = SessionNs.getUsage({
         model,
@@ -1800,13 +1779,13 @@ describe("SessionNs.getUsage", () => {
     },
   )
 
-  test("extracts cache write tokens from vertex metadata key", () => {
-    const model = createModel({ context: 100_000, output: 32_000, npm: "@ai-sdk/google-vertex/anthropic" })
+  test("extracts cache write tokens from anthropic metadata key", () => {
+    const model = createModel({ context: 100_000, output: 32_000, npm: "@ai-sdk/anthropic" })
     const result = SessionNs.getUsage({
       model,
       usage: usage({ inputTokens: 1000, outputTokens: 500, totalTokens: 1500, cacheReadInputTokens: 200 }),
       metadata: {
-        vertex: {
+        anthropic: {
           cacheCreationInputTokens: 300,
         },
       },

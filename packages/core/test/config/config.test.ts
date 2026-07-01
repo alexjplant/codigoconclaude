@@ -87,34 +87,6 @@ describe("Config", () => {
     }),
   )
 
-  it.effect("migrates v1 provider setup options into AISDK settings", () =>
-    Effect.sync(() => {
-      const migrated = ConfigMigrateV1.migrate({
-        provider: {
-          bedrock: {
-            npm: "@ai-sdk/amazon-bedrock",
-            options: {
-              headers: { "x-test": "1" },
-              body: { trace: true },
-              region: "us-east-1",
-              profile: "dev",
-            },
-          },
-        },
-      })
-
-      expect(migrated.providers?.bedrock?.api).toEqual({
-        type: "aisdk",
-        package: "@ai-sdk/amazon-bedrock",
-        settings: { region: "us-east-1", profile: "dev" },
-      })
-      expect(migrated.providers?.bedrock?.request).toEqual({
-        headers: { "x-test": "1" },
-        body: { trace: true },
-      })
-    }),
-  )
-
   it.effect("migrates v1 command configuration", () =>
     Effect.sync(() => {
       expect(
@@ -278,7 +250,6 @@ describe("Config", () => {
                 shell: "/bin/bash",
                 model: "anthropic/claude",
                 default_agent: "reviewer",
-                autoupdate: "notify",
                 share: "disabled",
                 enterprise: { url: "https://share.example.com" },
                 username: "test-user",
@@ -364,7 +335,6 @@ describe("Config", () => {
             expect(documents[0]?.info.shell).toBe("/bin/bash")
             expect(documents[0]?.info.model).toBe("anthropic/claude")
             expect(documents[0]?.info.default_agent).toBe("reviewer")
-            expect(documents[0]?.info.autoupdate).toBe("notify")
             expect(documents[0]?.info.share).toBe("disabled")
             expect(documents[0]?.info.enterprise).toEqual({ url: "https://share.example.com" })
             expect(documents[0]?.info.username).toBe("test-user")

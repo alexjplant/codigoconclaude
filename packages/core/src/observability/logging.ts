@@ -1,7 +1,7 @@
 import { Formatter, Logger, type LogLevel } from "effect"
 import path from "path"
 import { Global } from "../global"
-import { runID } from "./shared"
+const runID = crypto.randomUUID().slice(0, 8)
 
 function formatter(id: string = runID) {
   return Logger.map(Logger.formatStructured, (output) => {

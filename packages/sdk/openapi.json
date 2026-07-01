@@ -21229,18 +21229,6 @@
           "autoshare": {
             "type": "boolean"
           },
-          "autoupdate": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "string",
-                "enum": ["notify"]
-              }
-            ],
-            "description": "Automatically update to the latest version. Set to true to auto-update, false to disable, or 'notify' to show update notifications"
-          },
           "disabled_providers": {
             "type": "array",
             "items": {
@@ -21507,9 +21495,6 @@
                 "type": "boolean"
               },
               "batch_tool": {
-                "type": "boolean"
-              },
-              "openTelemetry": {
                 "type": "boolean"
               },
               "primary_tools": {

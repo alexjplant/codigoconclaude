@@ -66,9 +66,9 @@ Runtime hooks intercept live operations rather than rebuilding domain state:
 yield *
   ctx.aisdk.sdk(
     Effect.fn(function* (event) {
-      if (event.package !== "@ai-sdk/xai") return
-      const mod = yield* Effect.promise(() => import("@ai-sdk/xai"))
-      event.sdk = mod.createXai(event.options)
+      if (event.package !== "@ai-sdk/anthropic") return
+      const mod = yield* Effect.promise(() => import("@ai-sdk/anthropic"))
+      event.sdk = mod.createAnthropic(event.options)
     }),
   )
 

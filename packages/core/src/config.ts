@@ -39,11 +39,6 @@ export class Info extends Schema.Class<Info>("Config.Info")({
   default_agent: Schema.String.pipe(Schema.optional).annotate({
     description: "Default primary agent to use when no session agent is selected",
   }),
-  autoupdate: Schema.Union([Schema.Boolean, Schema.Literal("notify")])
-    .pipe(Schema.optional)
-    .annotate({
-      description: "Automatically update or notify when a new version is available",
-    }),
   share: Schema.Literals(["manual", "auto", "disabled"]).pipe(Schema.optional).annotate({
     description: "Control whether sessions may be shared manually, automatically, or not at all",
   }),
@@ -55,7 +50,7 @@ export class Info extends Schema.Class<Info>("Config.Info")({
       description: "Enterprise sharing service configuration",
     }),
   username: Schema.String.pipe(Schema.optional).annotate({
-    description: "Username displayed in conversations and used for telemetry identity",
+    description: "Username displayed in conversations",
   }),
   permissions: Permission.Ruleset.pipe(Schema.optional).annotate({
     description: "Ordered tool permission rules applied to agent tool use",

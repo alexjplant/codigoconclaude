@@ -11,7 +11,7 @@ This document breaks the legacy configuration schema into small review groups. W
 
 ## Schema Scope
 
-Use one v2 config schema for now. Some fields, such as `autoupdate`, are intended for global/user configuration, but there is not yet enough benefit to enforce that with separate global and location schemas. Revisit this if more scope-sensitive fields survive the review.
+Use one v2 config schema for now. Some fields are intended for global/user configuration, but there is not yet enough benefit to enforce that with separate global and location schemas. Revisit this if more scope-sensitive fields survive the review.
 
 V2 core discovers config documents named `opencode.json` or `opencode.jsonc` in the global config directory, ancestor project directories, and `.opencode` config directories. The legacy `config.json` filename is not supported in V2.
 
@@ -32,7 +32,6 @@ Settings that affect process startup, shell execution, or network serving. Revie
 | `shell`      | Default shell for terminal and shell tool execution | keep   | Port as effective config; shared shell choice is used throughout opencode.     |
 | `logLevel`   | Intended logging level configuration                | remove | Do not port: no config consumer exists and logging initializes from CLI input. |
 | `server`     | Hostname, port, mDNS, and CORS settings             | remove | Do not port: location config is loaded after the server is already running.    |
-| `autoupdate` | Automatic update or notification behavior           | keep   | Global-only user preference; keep `true`, `false`, and `"notify"`.             |
 
 ## Group 3: Commands And Project Resources
 

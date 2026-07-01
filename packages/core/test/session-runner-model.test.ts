@@ -316,16 +316,16 @@ describe("SessionRunnerModel", () => {
   it.effect("rejects catalog APIs without a native route", () =>
     Effect.gen(function* () {
       const failure = yield* SessionRunnerModel.fromCatalogModel(
-        model({ type: "aisdk", package: "@ai-sdk/google", url: "https://google.example/v1" }),
+        model({ type: "aisdk", package: "@ai-sdk/nonexistent-package", url: "https://example.test/v1" }),
       ).pipe(Effect.flip)
 
       expect(failure).toMatchObject({
         _tag: "SessionRunnerModel.UnsupportedApiError",
         providerID: "test-provider",
         modelID: "test-model",
-        api: "aisdk:@ai-sdk/google",
+        api: "aisdk:@ai-sdk/nonexistent-package",
       })
-      expect(failure.message).toBe("Unsupported API for test-provider/test-model: aisdk:@ai-sdk/google")
+      expect(failure.message).toBe("Unsupported API for test-provider/test-model: aisdk:@ai-sdk/nonexistent-package")
     }),
   )
 
@@ -338,7 +338,7 @@ describe("SessionRunnerModel", () => {
       ).toBe(true)
       expect(
         SessionRunnerModel.supported(
-          model({ type: "aisdk", package: "@ai-sdk/google", url: "https://google.example/v1" }),
+          model({ type: "aisdk", package: "@ai-sdk/nonexistent-package", url: "https://example.test/v1" }),
         ),
       ).toBe(false)
       expect(SessionRunnerModel.supported(model({ type: "native", settings: {} }))).toBe(false)

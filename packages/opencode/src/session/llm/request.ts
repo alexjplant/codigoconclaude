@@ -89,13 +89,6 @@ export const prepare = Effect.fn("LLMRequestPrep.prepare")(function* (input: Pre
         providerOptions: input.provider.options,
       })
   const options = mergeOptions(mergeOptions(mergeOptions(base, input.model.options), input.agent.options), variant)
-  if (
-    input.model.api.npm === "@ai-sdk/azure" &&
-    (input.provider.options.useCompletionUrls || input.model.options.useCompletionUrls || options.useCompletionUrls)
-  ) {
-    delete options.reasoningSummary
-    delete options.include
-  }
   if (isOpenaiOauth) options.instructions = system.join("\n")
 
   const messages =
@@ -149,11 +142,7 @@ export const prepare = Effect.fn("LLMRequestPrep.prepare")(function* (input: Pre
   // Codex parity: OpenAI Responses-family providers hardcode `strict: false`
   // on every function tool so MCP-sourced and dynamic schemas that don't
   // satisfy OpenAI's structured-outputs constraints still register.
-  if (
-    input.model.api.npm === "@ai-sdk/openai" ||
-    input.model.api.npm === "@ai-sdk/azure" ||
-    input.model.api.npm === "@ai-sdk/amazon-bedrock/mantle"
-  ) {
+  if (input.model.api.npm === "@ai-sdk/openai") {
     for (const key of Object.keys(tools)) tools[key] = { ...tools[key], strict: false }
   }
   if (
